@@ -1,0 +1,25 @@
+name: Native Telemetry Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Clang
+        run: sudo apt-get update && sudo apt-get install -y clang
+
+      - name: Compile telemetry engine
+        run: |
+          mkdir -p build
+          clang -O2 -Wall -Wextra -Wpedantic -D_FORTIFY_SOURCE=2 \
+            -o build/behemoth_telemetry \
+            telemetry/behemoth_telemetry.c
+
+      - name: Verify Python classifier
+        run: python3 -m py_compile telemetry/classify_thermal.py
